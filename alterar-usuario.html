@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alterar Usuario</title>
+</head>
+<script>
+    var ACAO_INCLUSAO = "INCLUSAO";
+    var ACAO_ALTERACAO = "ACAO_ALTERACAO";
+    var ACAO = "ACAO_ALTERACAO";
+    function atualizaPaginaUsuario() {
+        const codigo_usuario = sessionStorage.getItem("usucodigo");
+
+        if (codigo_usuario != null) {
+            ACAO = ACAO_ALTERACAO;
+
+            loadDadosUsuario(codigo_usuario);
+            document.querySelector("#usucodigoAlteracao").innerHTML = "codigo informado:" + codigo_usuario;
+        } else {
+            // alert("codigo usuario nao informado!");
+            ACAO = ACAO_INCLUSAO;
+        }
+    }
+
+    function loadDadosUsuario(codigo_usuario) {
+        console.log("alterando usuario..." + codigo_usuario);
+
+        var metodo = "POST";
+        var porta = "consultausuariofiltro";
+
+        var body = {
+            campofiltro: "usucodigo",
+            operadorfiltro: "igual",
+            valorfiltro: codigo_usuario
+        };
+
+        callApi(metodo, porta, body, function (data) {
+            loadAlteracaoUsuario(data);
+        });
+    }
+
+    function loadAlteracaoUsuario(data) {
+        const aDadosUsuarios = data;
+
+        aDadosUsuarios.forEach(function (oUsuario, key) {
+            const nome = oUsuario.usunome;
+            const email = oUsuario.usuemail;
+            const situacao = oUsuario.usuativo;
+            const codigo = oUsuario.usucodigo;
+
+            document.querySelector("#usucodigo").value = codigo;
+            document.querySelector("#usunome").value = nome;
+            document.querySelector("#usuemail").value = email;
+            document.querySelector("#usuativo").value = situacao;
+        });
+    }
+
+    function confirmar() {
+        if (ACAO == ACAO_ALTERACAO) {
+            confirmarAlteraçaoUsuario();
+        } else if (ACAO == ACAO_ALTERACAO) {
+            confirmarInclusaoUsuario();
+        } else {
+            alert("Ação não encontrada!");
+        }
+    }
+    function confirmarAlteraçaoUsuario() {
+        console.log("Incluindo usuario...");
+
+        //chamar api
+
+        const usucodigo = document.querySelector("#usucodigo").value;
+        const usunome = document.querySelector("#usunome").value;
+        const usuemail = document.querySelector("#usuemail").value;
+        const usuativo = document.querySelector("#usuativo").value;
+
+        const body = {
+            usucodigo: usucodigo,
+            usunome: usunome,
+            usuemail: usuemail,
+            usuativo: usuativo
+
+        };
+        var metodo = "POST";
+        var porta = "executainclusao";
+
+        callApi(metodo, porta, body, function (data) {
+            alert(data.mensagem);
+
+            sessionStorage.removeItem("usucodigo");
+
+            window.location.href = "usuario-consulta-edicao.html";
+        });
+    }
+
+        function confirmarAlteraçaoUsuario() {
+            console.log("alterando usuario...");
+
+            //chamar api
+
+            const usucodigo = document.querySelector("#usucodigo").value;
+            const usunome = document.querySelector("#usunome").value;
+            const usuemail = document.querySelector("#usuemail").value;
+            const usuativo = document.querySelector("#usuativo").value;
+
+            const body = {
+                usucodigo: usucodigo,
+                usunome: usunome,
+                usuemail: usuemail,
+                usuativo: usuativo
+
+            };
+            var metodo = "POST";
+            var porta = "executaalteracao";
+
+            callApi(metodo, porta, body, function (data) {
+                alert(data.mensagem);
+
+                sessionStorage.removeItem("usucodigo");
+
+                window.location.href = "usuario-consulta-edicao.html";
+            });
+
+        }
+</script>
+
+<body onload="atualizaPaginaUsuario()">
+    <h1>Usuario sendo alterado</h1>
+    <h2 id="usucodigoAlteracao"> Nao informado</h2>
+
+    <!-- <form action=""> -->
+    <label for="usucodigo">Codigo</label>
+    <input type="text" id="usucodigo">
+    <br>
+    <label for="usunome">Nome</label>
+    <input type="text" id="usunome">
+    <br>
+    <label for="usuemail">E-mail</label>
+    <input type="text" id="usuemail">
+    <br>
+    <label for="usuativo">Ativo</label>
+    <select id="usuativo">
+        <option value="1">Sim</option>
+        <option value="0">Não</option>
+    </select>
+    <br>
+
+    <button onclick=confirmarAlteraçaoUsuario()>Confirmar</button>
+    <!-- </form> -->
+
+</body>
+
+<script src="js/api.js" defer></script>
+
+</html>

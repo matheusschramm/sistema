@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema</title>
+</head>
+<script>
+    async function callApiTerceiros(method, port, body, oCall, urlParam) {
+
+        if (body == undefined) {
+            body = "";
+        }
+
+        if (method == undefined) {
+            method = "GET";
+        }
+
+        if (port == undefined) {
+            port = "ping";
+        }
+
+        // Define a url
+        let url = getUrlBase(port);
+        if (urlParam) {
+            url = urlParam + port;
+        }
+
+        console.log("url gerada:" + url);
+
+        const myInit = getInitFetchApi(method, body);
+
+        const promise = await fetch(url, myInit)
+            // Converting the response to a JSON object
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data)
+
+                //var data1 = JSON.stringify(data);
+
+                //const dados = JSON.parse(data);
+
+                if (oCall) {
+                    // Chama a function por parametor com os dados retornados...
+                    oCall(data);
+                }
+
+            })
+            .catch(function (error) {
+                console.log('There has been a problem with your fetch operation: ' + error.message);
+            });
+    }
+
+    function getInitFetchApi(method, body) {
+        let usaBody = false;
+        if (method == "POST") {
+            usaBody = true;
+        }
+
+        if (usaBody) {
+            return {
+                method: method,
+                headers: getHeadersApi(),
+                mode: 'cors',
+                cache: 'default',
+                body: JSON.stringify(body)
+            };
+        }
+
+        return {
+            method: method,
+            headers: getHeadersApi(),
+            mode: 'cors',
+            cache: 'default'
+        };
+    }
+
+    function getHeadersApi() {
+        return new Headers({
+            "Accept": "Application/json",
+            "chave-api-dados": "e87c65b7590a28a987705526d3812c4a",
+            "Content-Type": "Application/json"
+        });
+    }
+
+    function ping() {
+        var metodo = "GET";
+        var porta = "sistema";
+        var body = undefined;
+
+        callApi(metodo, porta, body, function (data) {
+            // retorno da api sendo setado no campo de resultado
+            document.querySelector("#resultado").innerHTML = JSON.stringify(data);
+        });
+    }
+
+    function getAuxilios() {
+        const urlApi = "https://api.portaldatransparencia.gov.br/api-de-dados/auxilio-emergencial-beneficiario-por-municipio";
+
+        // Parametros da URL
+        var porta = "?codigoIbge=4214805&mesAno=202101&pagina=10";
+
+        var metodo = "GET";
+        var body = undefined;
+
+        callApiTerceiros(metodo, porta, body, function (data) {
+            // retorno da api sendo setado no campo de resultado
+            document.querySelector("#resultado").innerHTML = JSON.stringify(data);
+        }, urlApi);
+    }
+
+  async  function getCafes() {
+        // https://coffee.alexflipnote.dev/random.json
+
+        const metodo = "GET";
+        
+    }
+</script>
+
+<body>
+    <hr>
+    <button onclick="ping()">Ping</button>
+    <button onclick="getAuxilios()">Auxilio Emergencial</button>
+    <button onclick="getCafes()">Cafés</button>
+    <hr>
+    <h1>Resultado</h1>
+    <span id="resultado">Resultado...</span>
+</body>
+
+<script src="js/api.js" defer></script>
+
+</html>

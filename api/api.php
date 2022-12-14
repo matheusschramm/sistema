@@ -2,6 +2,7 @@
 
 date_default_timezone_set('America/Maceio');
 
+
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
@@ -45,7 +46,7 @@ class Routes {
         $app->group('', function () use ($app) {
             // Pagina inicial da api
             $app->get('/', ControllerApiBase::class . ':home');
-
+            
             // Ping
             $app->get('/ping', ControllerApiBase::class . ':callPing');
             $app->post('/ping', ControllerApiBase::class . ':callPing');
@@ -53,26 +54,40 @@ class Routes {
             // Folhas de pagamento
             $app->get('/folha', ControllerApiFolhaPagamento::class . ':index');
             $app->get('/folhadetalhe/{codigofolha}', ControllerApiFolhaPagamento::class . ':detalhaFolha');
-    
+            
             // Cadastros - Usuarios
             $app->post('/login', ControllerApiUsuario::class . ':loginUsuario');
             $app->post('/users', ControllerApiUsuario::class . ':gravaUsuario');
             $app->delete('/users', ControllerApiUsuario::class . ':deleteUsuario');
-
+            
             $app->get('/users', ControllerApiUsuario::class . ':getUsuario');
             
             $app->put('/updatepassword', ControllerApiUsuario::class . ':updatePassword');
             $app->post('/resetpassword', ControllerApiUsuario::class . ':resetPassword');
             
-             // Pagina inicial da api
-            //aula 01-12-2022 
-             $app->get('/sistema', ControllerApiBase::class . ':callPing');
-       
+            // AULA 01-12-2022
+            // Sistema
+            $app->get('/sistema', ControllerApiSistema::class . ':callPing');
+            $app->get('/usuario', ControllerApiSistema::class . ':getUsuario');
+            $app->get('/pessoa', ControllerApiSistema::class . ':getPessoa');
+            $app->get('/produto', ControllerApiSistema::class . ':getProduto');
 
-            })->add($this->getMiddlewares());
+            //aula 12-12-22
+
+            $app->post('/consultausuariofiltro', ControllerApiSistema::class . ':getConsultaUsuarioFiltro');
+      
+            //aula 13-12-22
+
             
+            $app->post('/executaalteracao', ControllerApiSistema::class . ':alterarUsuario');
             
-            $app->run();
+            $app->post('/executainlcusao', ControllerApiSistema::class . ':incluirUsuario');
+            
+            $app->post('/excluirusuario', ControllerApiSistema::class . ':excluirUsuario');
+
+        })->add($this->getMiddlewares());
+
+        $app->run();
     }
 
     /**
